@@ -22,9 +22,9 @@ const mostPopularBit = (diagnosticArray) => {
   diagnosticArray.forEach((datapoint) => {
     const binaryArray = datapoint.split("");
     binaryArray.forEach((digit, i) => {
-      const value = digit === "1" ? "on" : "off";
+      const value = digit === "1" ? "1" : "0";
       if (!counts[i + 1]) {
-        counts[i + 1] = { on: 0, off: 0 };
+        counts[i + 1] = { 1: 0, 0: 0 };
       }
       counts[i + 1][value]++;
     });
@@ -33,41 +33,60 @@ const mostPopularBit = (diagnosticArray) => {
   return counts;
 };
 
-const determineOxygen = (input) => {
-  let oxygen = [...input];
-  let filterBit;
-  const counts = mostPopularBit(input);
-  const positions = Object.keys(counts);
-  while (oxygen.length > 1) {
-    positions.forEach((position, i) => {
-      const bits = counts[position];
-      if (bits["on"] > bits["off"]) {
-        filterBit = 1;
-      } else {
-        filterBit = 0;
-      }
-      oxygen = oxygen.filter((datapoint) => {
-        const datapointArray = datapoint.split("");
-        console.log({ oxygen });
-        return parseInt(datapointArray[position]) === filterBit;
-      });
-    });
-  }
-
-  return oxygen[0];
+const filterData = (dataArray, position, filterBit) => {
+  return dataArray.filter((datapoint) => {
+    const digits = datapoint.split("");
+    return parseInt(digits[position]) === filterBit;
+  });
 };
-const determineCO2 = () => {
-  const co2 = [];
+
+const determineOxygen = (input) => {
+  let oxygen = [];
+
   const counts = mostPopularBit(input);
   const positions = Object.keys(counts);
+  positions.forEach((position, i) => {
+    const bits = counts[position];
+    if (bits["1"] > bits["0"]) {
+      oxygen.push("1");
+    } else {
+      oxygen.push("0");
+    }
+  });
+
+  return oxygen.join("");
+};
+
+const determineCO2 = (input) => {
+  let co2 = [];
+  const counts = mostPopularBit(input);
+  const positions = Object.keys(counts);
+  positions.forEach((position, i) => {
+    const bits = counts[position];
+    console.log({ [position]: bits });
+    if (bits["1"] < bits["0"]) {
+      co2.push("1");
+    } else {
+      co2.push("0");
+    }
+  });
+
+  return co2.join("");
 };
 
 const determineLifeSupportMetrics = (input) => {
-  determineOxygen(input);
-  // determineCO2();
+  // console.log({
+  //   included: input.includes(determineOxygen(input)),
+  //   binary: determineOxygen(input),
+  // });
+  console.log({
+    included: input.includes(determineCO2(input)),
+    binary: determineCO2(input),
+  });
+  // return parseInt(determineOxygen(input), 2) * parseInt(determineCO2(input), 2);
 };
 
-console.log(determineLifeSupportMetrics(testInput));
+console.log(determineLifeSupportMetrics(input));
 
 // Object.keys(counts).forEach((position) => {
 //   const on = counts[position]["on"];
